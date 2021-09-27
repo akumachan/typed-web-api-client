@@ -35,8 +35,9 @@ export const ApiClient = (url: `http${string}/`) => ({
         Response extends GetType<T[P][M], 'response'>
       >(path: P, method: M, parameters: Parameters): Promise<Response> => {
 
+        const fullPath = `${url}${path as string}`
         const methodName = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' 
-        const response = await axios[methodName]<Response>(path as string, parameters)
+        const response = await axios[methodName]<Response>(fullPath, parameters)
 
         if(response.status === 200) {
           return response.data
