@@ -1,5 +1,5 @@
 {
-  "name": "@akumachan/web-api-client",
+  "name": "@akumachan/typed-web-api-client",
   "version": "1.0.1",
   "description": "Web API client made with Typescript.",
   "main": "dist/index.js",
