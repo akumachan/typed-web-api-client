@@ -25,7 +25,7 @@ type Method<A extends ApiScheme, S extends string | symbol | number> = {
 }[keyof A]
 type GetType<A extends ApiScheme, K> = K extends keyof A ? A[K] : undefined
 
-export const ApiClient = (url: `http${string}/`) => ({
+export const ApiClient = (url: `http${string}`) => ({
   service: <T extends ApiScheme>() => {
     return {  
       call: async<
