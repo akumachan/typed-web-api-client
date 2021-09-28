@@ -31,13 +31,13 @@ export const ApiClient = (url: `http${string}`) => ({
       call: async<
         P extends Path<T>, 
         M extends Method<T, P>, 
-        Parameters extends GetType<T[P][M], 'parameters'>,
-        Response extends GetType<T[P][M], 'response'>
-      >(path: P, method: M, parameters: Parameters): Promise<Response> => {
+        ApiParameters extends GetType<T[P][M], 'parameters'>,
+        ApiResponse extends GetType<T[P][M], 'response'>
+      >(path: P, method: M, parameters: ApiParameters): Promise<ApiResponse> => {
 
         const fullPath = `${url}${path as string}`
         const methodName = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' 
-        const response = await axios[methodName]<Response>(fullPath, parameters)
+        const response = await axios[methodName]<ApiResponse>(fullPath, parameters)
 
         if(response.status === 200) {
           return response.data
