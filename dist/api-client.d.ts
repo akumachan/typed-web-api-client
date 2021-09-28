@@ -21,7 +21,7 @@ declare type Method<A extends ApiScheme, S extends string | symbol | number> = {
 declare type GetType<A extends ApiScheme, K> = K extends keyof A ? A[K] : undefined;
 export declare const ApiClient: (url: `http${string}`) => {
     service: <T extends ApiScheme>() => {
-        call: <P extends keyof T, M extends Method<T, P>, Parameters_1 extends GetType<T[P][M], "parameters">, Response_1 extends GetType<T[P][M], "response">>(path: P, method: M, parameters: Parameters_1) => Promise<Response_1>;
+        call: <P extends keyof T, M extends Method<T, P>, ApiParameters extends GetType<T[P][M], "parameters">, ApiResponse extends GetType<T[P][M], "response">>(path: P, method: M, parameters: ApiParameters) => Promise<ApiResponse>;
     };
 };
 export {};
