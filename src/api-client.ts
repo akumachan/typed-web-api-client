@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 type AllowOneOrMoreOf<T extends object> =
   T | ({
@@ -25,6 +25,7 @@ type Method<A extends ApiScheme, S extends string | symbol | number> = {
 }[keyof A]
 type GetType<A extends ApiScheme, K> = K extends keyof A ? A[K] : undefined
 
+export type HttpResponse<T> = Pick<AxiosResponse<T>, 'data' | 'status' | 'statusText'>
 export const ApiClient = (url: `http${string}`) => ({
   service: <T extends ApiScheme>() => {
     return {  
@@ -33,17 +34,11 @@ export const ApiClient = (url: `http${string}`) => ({
         M extends Method<T, P>, 
         ApiParameters extends GetType<T[P][M], 'parameters'>,
         ApiResponse extends GetType<T[P][M], 'response'>
-      >(path: P, method: M, parameters: ApiParameters): Promise<ApiResponse> => {
+      >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
 
         const fullPath = `${url}${path as string}`
         const methodName = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' 
-        const response = await axios[methodName]<ApiResponse>(fullPath, parameters)
-
-        if(response.status === 200) {
-          return response.data
-        } else {
-          throw new Error()
-        }
+        return axios[methodName]<ApiResponse>(fullPath, parameters)
       }
     }
   }
