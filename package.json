@@ -9,7 +9,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsc"
+    "tsc": "tsc",
+    "build": "npm run tsc"
   },
   "dependencies": {
     "axios": "^0.21.4",
