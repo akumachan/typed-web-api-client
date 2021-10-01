@@ -7,6 +7,7 @@
   "author": "Akumachan",
   "license": "MIT",
   "private": true,
+  "files": ["dist"],
   "scripts": {
     "tsc": "tsc",
     "postinstall": "npm run tsc"
