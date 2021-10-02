@@ -27,9 +27,9 @@ export type ApiScheme = {
 export type HttpResponse<T> = Pick<AxiosResponse<T>, 'data' | 'status' | 'statusText'>
 
 export class ApiClient {
-  constructor(private url: `http${string}`) {}
+  constructor(private url: `http${string}`, private commonParameters: {} = {}) {}
   service<T extends ApiScheme>() {
-    return {  
+    return {
       call: async<
         P extends Path<T>, 
         M extends Method<T, P>, 
@@ -41,7 +41,7 @@ export class ApiClient {
         type MethodTypeForAxios = 'get' | 'post' | 'put' | 'delete'
         const methodName = method.toLowerCase() as MethodTypeForAxios
 
-        return axios[methodName]<ApiResponse>(fullPath, parameters)
+        return axios[methodName]<ApiResponse>(fullPath, {...parameters, ...this.commonParameters})
       }
     }
   }
