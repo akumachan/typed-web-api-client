@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "tsc": "tsc",
-    "postinstall": "npm run tsc"
+    "postinstall": "npm run tsc",
+    "test": "jest"
   },
   "dependencies": {
     "axios": "^0.21.4",

@@ -37,30 +37,14 @@ export class ApiClient {
         ApiResponse extends GetType<T[P][M], 'response'>
       >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
 
-        const fullPath = `${this.url}${path as string}`
         type MethodTypeForAxios = 'get' | 'post' | 'put' | 'delete'
         const methodName = method.toLowerCase() as MethodTypeForAxios
+        const fullParameters = {...parameters, ...this.commonParameters}
+        const fullPath = `${this.url}${path as string}${methodName === 'get' ? '?' + new URLSearchParams(fullParameters).toString() : ''}`
+        
 
-        return axios[methodName]<ApiResponse>(fullPath, {...parameters, ...this.commonParameters})
+        return axios[methodName]<ApiResponse>(fullPath, fullParameters)
       }
     }
   }
 }
-
-export const ApiClient2 = (url: `http${string}`) => ({
-  service: <T extends ApiScheme>() => {
-    return {  
-      call: async<
-        P extends Path<T>, 
-        M extends Method<T, P>, 
-        ApiParameters extends GetType<T[P][M], 'parameters'>,
-        ApiResponse extends GetType<T[P][M], 'response'>
-      >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
-
-        const fullPath = `${url}${path as string}`
-        const methodName = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' 
-        return axios[methodName]<ApiResponse>(fullPath, parameters)
-      }
-    }
-  }
-})
