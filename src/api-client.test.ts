@@ -4,29 +4,6 @@ jest.mock('axios')
 import axios, { AxiosInstance } from 'axios'
 
 const mockAxios: jest.Mocked<AxiosInstance> = axios as any;
-mockAxios.get.mockImplementation((url: string) => 
-  Promise.resolve( 
-    { 
-      status: 200,
-      statusText: 'OK',
-      data: { 
-        url,
-        method: 'GET',
-      } 
-    }))
-mockAxios.post.mockImplementation(
-  (url: string, parameters: { message: string }) =>  
-    Promise.resolve(
-      { 
-        status: 200, 
-        statusText: 'OK', 
-        data: {
-          url, 
-          method: 'POST',
-          message: parameters.message,
-        } 
-      }
-    ))
 
 type ExpectedResponse = { 
   url: string;
@@ -77,6 +54,18 @@ const service = client.service<TestScheme>()
 
 describe('Get method', () => {
   test('should succeeded.', () => {
+    const mockedSuccess = (url: string) => Promise.resolve( 
+      { 
+        status: 200,
+        statusText: 'OK',
+        data: { 
+          url,
+          method: 'GET',
+        } 
+      }
+    )
+    mockAxios.get.mockImplementation(mockedSuccess)
+
     const expected: HttpResponse<ExpectedResponse> = {
       status: 200,
       statusText: 'OK',
@@ -89,6 +78,19 @@ describe('Get method', () => {
 })
 describe('Post method', () => {
   test('should succeed.', async () => {
+    const mockedSuccess = (url: string, parameters: { message: string }) =>  Promise.resolve(
+      { 
+        status: 200, 
+        statusText: 'OK', 
+        data: {
+          url, 
+          method: 'POST',
+          message: parameters.message,
+        } 
+      }
+    )
+    mockAxios.post.mockImplementation(mockedSuccess)
+
     const expected: HttpResponse<ExpectedResponse> = {
       status: 200,
       statusText: 'OK',
