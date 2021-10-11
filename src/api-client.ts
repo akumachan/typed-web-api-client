@@ -8,7 +8,7 @@ type AllowOneOrMoreOf<T extends object> =
   } extends infer $ ? $[keyof $] : never)
 
 type PathPattern = `/${string}`
-type MethodList = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type MethodList = 'GET' | 'POST'
 
 type Path<A extends ApiScheme> = keyof A
 type Method<A extends ApiScheme, S extends string | symbol | number> = {
@@ -37,7 +37,7 @@ export class ApiClient {
         ApiResponse extends GetType<T[P][M], 'response'>
       >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
 
-        type MethodTypeForAxios = 'get' | 'post' | 'put' | 'delete'
+        type MethodTypeForAxios = 'get' | 'post'
         const methodName = method.toLowerCase() as MethodTypeForAxios
         const fullParameters = {...parameters, ...this.commonParameters}
         const fullPath = `${this.url}${path as string}${methodName === 'get' ? '?' + new URLSearchParams(fullParameters).toString() : ''}`

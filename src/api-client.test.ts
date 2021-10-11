@@ -9,10 +9,11 @@ type ExpectedResponse = {
   url: string;
   method: string;
   message?: string;
+  common?: string;
 }
 
 type TestScheme = {
-  [path in typeof testPath]: {
+  '/test': {
     'GET': {
       parameters: {
         message: string
@@ -25,80 +26,105 @@ type TestScheme = {
       };
       response: ExpectedResponse;
     };
-    'PUT': {
-      parameters: {
-        message: string
-      };
-      response: ExpectedResponse;
-    }
-    'DELETE': {
-      parameters: {
-        message: string
-      };
-      response: ExpectedResponse;
-    }
   }
 }
 
-const testUrl = 'http://example.com'
-const testPath = '/test'
-const testQuery = (method: string) => method === 'GET' ? `?message=${testMessage}` : ''
-const testMessage = 'TestMessage'
-const expectedData = (method: string) => ({
-  url: testUrl + testPath + testQuery(method),
-  message: method === 'GET' ? undefined : testMessage,
-  method
-})
-const client = new ApiClient(testUrl)
-const service = client.service<TestScheme>()
+const serviceWithCommon = new ApiClient('https://example.com', { common: 'Common' }).service<TestScheme>()
+const serviceWithoutCommon = new ApiClient('https://example.com').service<TestScheme>()
 
 describe('Get method', () => {
-  test('should succeeded.', () => {
-    const mockedSuccess = (url: string) => Promise.resolve( 
-      { 
-        status: 200,
-        statusText: 'OK',
-        data: { 
-          url,
-          method: 'GET',
-        } 
-      }
-    )
-    mockAxios.get.mockImplementation(mockedSuccess)
+
+  mockAxios.get.mockImplementation((url: string) => Promise.resolve( 
+    { 
+      status: 200,
+      statusText: 'OK',
+      data: { 
+        url,
+        method: 'GET',
+      } 
+    }
+  ))
+
+  test('should succeed with common parameters.', () => {
+
+    expect.assertions(1)
 
     const expected: HttpResponse<ExpectedResponse> = {
       status: 200,
       statusText: 'OK',
-      data: expectedData('GET')
+      data: {
+        url: 'https://example.com/test?message=Get+w%2F+common.&common=Common',
+        method: 'GET',
+      }
     }
+
+    return expect(serviceWithCommon.call('/test', 'GET', { message: 'Get w/ common.' })).resolves.toEqual(expected)
+  })
+
+  test('should succeed without common parameters.', () => {
+
     expect.assertions(1)
-    return expect(service.call('/test', 'GET', { message: testMessage }))
-      .resolves.toEqual(expected)
+
+    const expected: HttpResponse<ExpectedResponse> = {
+      status: 200,
+      statusText: 'OK',
+      data: {
+        url: 'https://example.com/test?message=Get+w%2Fo+common.',
+        method: 'GET',
+      }
+    }
+
+    return expect(serviceWithoutCommon.call('/test', 'GET', { message: 'Get w/o common.' })).resolves.toEqual(expected)
   })
 })
+
 describe('Post method', () => {
-  test('should succeed.', async () => {
-    const mockedSuccess = (url: string, parameters: { message: string }) =>  Promise.resolve(
-      { 
-        status: 200, 
-        statusText: 'OK', 
-        data: {
-          url, 
-          method: 'POST',
-          message: parameters.message,
-        } 
-      }
-    )
-    mockAxios.post.mockImplementation(mockedSuccess)
+
+  mockAxios.post.mockImplementation((url: string, parameters: { message: string, common: string }) =>  Promise.resolve(
+    { 
+      status: 200, 
+      statusText: 'OK', 
+      data: {
+        url, 
+        method: 'POST',
+        message: parameters.message,
+        common: parameters.common
+      } 
+    }
+  ))
+
+  test('should succeed with common parameters.', async () => {
+
+    expect.assertions(1)
 
     const expected: HttpResponse<ExpectedResponse> = {
       status: 200,
       statusText: 'OK',
-      data: expectedData('POST')
+      data: {
+        url: 'https://example.com/test',
+        method: 'POST',
+        message: 'Post w/ common.',
+        common: 'Common'
+      }
     }
-    expect.assertions(1)
-    const actual = expect(service.call('/test', 'POST', { message: testMessage }))
 
-    actual.resolves.toEqual(expected)
+    return expect(serviceWithCommon.call('/test', 'POST', { message: 'Post w/ common.' })).resolves.toEqual(expected)
+  })
+
+  test('should succeed without common parameters.', async () => {
+
+    expect.assertions(1)
+
+    const expected: HttpResponse<ExpectedResponse> = {
+      status: 200,
+      statusText: 'OK',
+      data: {
+        url: 'https://example.com/test',
+        method: 'POST',
+        message: 'Post w/o common.',
+      }
+    }
+
+    return expect(serviceWithoutCommon.call('/test', 'POST', { message: 'Post w/o common.' })).resolves.toEqual(expected)
   })
 })
