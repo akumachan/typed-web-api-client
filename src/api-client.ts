@@ -42,7 +42,7 @@ export class ApiClient {
         const fullParameters = {...parameters, ...this.commonParameters}
         const fullPath = `${this.url}${path as string}${methodName === 'get' ? '?' + new URLSearchParams(fullParameters).toString() : ''}`
         
-        return axios[methodName]<ApiResponse>(fullPath, fullParameters)
+        return axios[methodName]<ApiResponse>(fullPath, new URLSearchParams(fullParameters).toString())
       }
     }
   }
