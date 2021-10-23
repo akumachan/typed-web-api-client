@@ -14,6 +14,7 @@
     "url": "git+https://github.com/akumachan/typed-web-api-client.git"
   },
   "scripts": {
+    "build": "tsc",
     "tsc": "tsc",
     "postinstall": "npm run tsc",
     "test": "jest"
