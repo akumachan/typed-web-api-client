@@ -80,15 +80,14 @@ describe('Get method', () => {
 
 describe('Post method', () => {
 
-  mockAxios.post.mockImplementation((url: string, parameters: { message: string, common: string }) =>  Promise.resolve(
+  mockAxios.post.mockImplementation((url: string, parameters: {}) =>  Promise.resolve(
     { 
       status: 200, 
       statusText: 'OK', 
       data: {
         url, 
         method: 'POST',
-        message: parameters.message,
-        common: parameters.common
+        message: new URLSearchParams(parameters).toString()
       } 
     }
   ))
@@ -103,8 +102,7 @@ describe('Post method', () => {
       data: {
         url: 'https://example.com/test',
         method: 'POST',
-        message: 'Post w/ common.',
-        common: 'Common'
+        message: 'message=Post+w%2F+common.&common=Common',
       }
     }
 
@@ -121,7 +119,7 @@ describe('Post method', () => {
       data: {
         url: 'https://example.com/test',
         method: 'POST',
-        message: 'Post w/o common.',
+        message: 'message=Post+w%2Fo+common.',
       }
     }
 
