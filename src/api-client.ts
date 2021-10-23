@@ -29,21 +29,24 @@ export type HttpResponse<T> = Pick<AxiosResponse<T>, 'data' | 'status' | 'status
 export class ApiClient {
   constructor(private url: `http${string}`, private commonParameters: {} = {}) {}
   service<T extends ApiScheme>() {
-    return {
-      call: async<
-        P extends Path<T>, 
-        M extends Method<T, P>, 
-        ApiParameters extends GetType<T[P][M], 'parameters'>,
-        ApiResponse extends GetType<T[P][M], 'response'>
-      >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
+    return new Service<T>(this.url, this.commonParameters)
+  }
+}
 
-        type MethodTypeForAxios = 'get' | 'post'
-        const methodName = method.toLowerCase() as MethodTypeForAxios
-        const fullParameters = {...parameters, ...this.commonParameters}
-        const fullPath = `${this.url}${path as string}${methodName === 'get' ? '?' + new URLSearchParams(fullParameters).toString() : ''}`
-        
-        return axios[methodName]<ApiResponse>(fullPath, new URLSearchParams(fullParameters).toString())
-      }
-    }
+export class Service<T extends ApiScheme> {
+  constructor(private url: `http${string}`, private commonParameters: {} = {}) {}
+  call = async<
+    P extends Path<T>, 
+    M extends Method<T, P>, 
+    ApiParameters extends GetType<T[P][M], 'parameters'>,
+    ApiResponse extends GetType<T[P][M], 'response'>
+  >(path: P, method: M, parameters: ApiParameters): Promise<HttpResponse<ApiResponse>> => {
+
+    type MethodTypeForAxios = 'get' | 'post'
+    const methodName = method.toLowerCase() as MethodTypeForAxios
+    const fullParameters = {...parameters, ...this.commonParameters}
+    const fullPath = `${this.url}${path as string}${methodName === 'get' ? '?' + new URLSearchParams(fullParameters).toString() : ''}`
+    
+    return axios[methodName]<ApiResponse>(fullPath, new URLSearchParams(fullParameters).toString())
   }
 }
